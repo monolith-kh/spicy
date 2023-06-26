@@ -1,0 +1,81 @@
+namespace fbs;
+
+enum Command: byte {
+    welcome,
+    ping,
+    cube_create,
+    cube_status,
+    cube_remove,
+    player_get,
+    player_status,
+    player_checkin,
+    game_ready,
+    game_start,
+    game_finish,
+    response
+}
+
+enum CubeType: byte {
+    normal,
+    event
+}
+
+struct Vec3 {
+    x: float;
+    y: float;
+    z: float;
+}
+
+table Cube {
+    uid: int;
+    pos_cur: Vec3;
+    pos_target: Vec3;
+    speed: float;
+    type: CubeType;
+}
+
+table CubeList {
+    cubes: [Cube];
+}
+
+enum PlayerStatus: byte {
+    idle,
+    ready,
+    game
+}
+
+table Player {
+    uid: int;
+    username: string;
+    image_url: string;
+    score: int;
+    status: PlayerStatus;
+}
+
+table PlayerList {
+    players: [Player];
+}
+
+table Ticket {
+    wrb_id: string;
+}
+
+enum Sender: byte {
+    server,
+    client
+}
+
+table Response {
+    requested_command: Command;
+    error_code: int;
+    detail: string;
+}
+
+union Data { Cube, CubeList, Player, PlayerList, Ticket, Response }
+
+table Frame {
+    timestamp: long;
+    command: Command;
+    sender: Sender;
+    data: Data;
+}

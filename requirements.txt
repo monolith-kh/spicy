@@ -1,0 +1,5 @@
+Twisted==22.10.0
+flatbuffers==23.5.26
+# flatbuffers==23.3.3
+# flatbuffers==2.0
+arcade==2.6.17
