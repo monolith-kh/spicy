@@ -33,7 +33,7 @@ class ArcadeWindow(arcade.Window):
     __logger = Logger(__name__)
 
     def __init__(self, game_server_factory: GameServerFactory):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__(int(SCREEN_WIDTH), int(SCREEN_HEIGHT), SCREEN_TITLE)
         self.game_server_factory: GameServerFactory = game_server_factory
         self.state = None
 

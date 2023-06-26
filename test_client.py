@@ -202,7 +202,7 @@ class ArcadeWindow(arcade.Window):
     __logger = Logger(__name__)
 
     def __init__(self, game_client_factory: GameClientFactory):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__(int(SCREEN_WIDTH), int(SCREEN_HEIGHT), SCREEN_TITLE)
         self.game_client_factory = game_client_factory
         
         self.manager = arcade.gui.UIManager()
