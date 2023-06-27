@@ -163,11 +163,11 @@ class FlatbuffersBuilder:
     def _get_cube(self, builder, c: 'cube.Cube'):
         Cube.Start(builder)
         Cube.AddUid(builder, c.uid)
+        # transform to unity axis (x, z, y)
+        # transform cetimeter to meter
         pos_cur = Vec3.CreateVec3(builder, c.center_x/100., random.randrange(0, 300)/100., c.center_y/100.)
-        # pos_cur = Vec3.CreateVec3(builder, c.center_x, c.center_y, 0)
         Cube.AddPosCur(builder, pos_cur)
         pos_target = Vec3.CreateVec3(builder, (c.center_x+c.change_x)/100., random.randrange(0, 300)/100., (c.center_y+c.change_y)/100.)
-        # pos_target = Vec3.CreateVec3(builder, c.center_x+c.change_x, c.center_y+c.change_y, 0)
         Cube.AddPosTarget(builder, pos_target)
         Cube.AddSpeed(builder, 1)
         Cube.AddType(builder, c._type)

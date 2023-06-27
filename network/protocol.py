@@ -91,10 +91,13 @@ class GameProtocol(ABC, SizedPacketProtocol):
             ps = self.player_manager.get_players()
             fb_data = self.fb_builder.response_player_status(ps)
             self.write(fb_data)
+        elif received_frame.Command() == Command.Command.player_checkin:
+            ...
+            # TODO:
         elif received_frame.Command() == Command.Command.cube_create:
             ...
             # TODO:
-        elif received_frame.Command() == Command.Command.cube_get:
+        elif received_frame.Command() == Command.Command.cube_remove:
             ...
             # TODO:
         elif received_frame.Command() == Command.Command.cube_status:
