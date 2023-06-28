@@ -12,8 +12,8 @@ SPLASH_TIME = 3.0
 
 PING_ALL_TIME = 10.0
 
-FONT = 'KenVector Future'
-FONT_THIN = f'{FONT} Thin'
+FONT = 'Kenney Future'
+FONT_THIN = 'Kenney Mini Square'
 
 from .app import ArcadeState, ArcadeWindow, start_arcade, exit_arcade
 from .cube import Cube
