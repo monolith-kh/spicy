@@ -13,13 +13,8 @@ from game import app, cube
 
 from network.factory import Worker, WorkerAction
 
-player_count = 4
-basic_spawn_count = 20
-extra_spawn_count = 3
-extra_spawn_time = 3.0
-cube_max_count = 1000
-
 cube_size = 0.04
+
 
 class GameView(arcade.View):
     __logger = Logger(__name__)
@@ -30,11 +25,12 @@ class GameView(arcade.View):
         self.cube_list: arcade.SpriteList = None
         self.pillar_1: arcade.Sprite = None
         self.pillar_2: arcade.Sprite = None
+        self.settings: app.Settings = self.window.settings
 
     def setup(self):
         self.cube_index = 0
         self.cube_list = arcade.SpriteList()
-        cl = self.create_cube(basic_spawn_count * player_count, 0)
+        cl = self.create_cube(self.settings.basic_spawn_count * self.settings.number_of_players, 0)
         arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.cube_create, cl))
         self.cube_list.extend(cl)
 
@@ -46,7 +42,7 @@ class GameView(arcade.View):
 
     def on_show_view(self):
         self.setup()
-        arcade.schedule(self.extra_cube, extra_spawn_time)
+        arcade.schedule(self.extra_cube, self.settings.auto_spawn_time)
 
     def on_draw(self):
         self.clear()
@@ -67,13 +63,13 @@ class GameView(arcade.View):
         arcade.get_window().set_state(app.ArcadeState.result)
 
     def extra_cube(self, delta_time: float) -> None:
-        if len(self.cube_list) <= cube_max_count - extra_spawn_count:
-            cl = self.create_cube(extra_spawn_count*player_count, 1)
+        if len(self.cube_list) <= self.settings.max_spawn_count - self.settings.auto_spawn_count:
+            cl = self.create_cube(self.settings.auto_spawn_count*self.settings.number_of_players, 1)
             arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.cube_create, cl))
             self.cube_list.extend(cl)
-            self.__logger.info(f'added {extra_spawn_count*player_count} cube')
+            self.__logger.info(f'added {self.settings.auto_spawn_count*self.settings.number_of_players} cube')
         else:
-            self.__logger.info(f'can\'t add cube(max: {cube_max_count})')
+            self.__logger.info(f'can\'t add cube(max: {self.settings.max_spawn_count})')
 
     def create_cube(self, count, _type) -> List:
         cl = list()

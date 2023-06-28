@@ -25,6 +25,3 @@ class IdleView(arcade.View):
         arcade.draw_text("Monolith", self.window.width / 2, self.window.height / 2-75,
                          arcade.color.WHITE, font_size=20, anchor_x="center",
                          font_name=FONT_THIN)
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        ...

@@ -73,6 +73,3 @@ class MenuView(arcade.View):
     def on_draw(self):
         self.clear()
         self.manager.draw()
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        ...

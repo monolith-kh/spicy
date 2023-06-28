@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum, auto
+from dataclasses import dataclass
 
 import arcade
 from twisted.logger import Logger
@@ -28,6 +29,15 @@ class ArcadeState(Enum):
     settings = auto()
 
 
+@dataclass
+class Settings:
+    number_of_players: int
+    basic_spawn_count: int
+    auto_spawn_count: int
+    auto_spawn_time: float
+    max_spawn_count: int
+
+
 class ArcadeWindow(arcade.Window):
 
     __logger = Logger(__name__)
@@ -36,6 +46,14 @@ class ArcadeWindow(arcade.Window):
         super().__init__(int(SCREEN_WIDTH), int(SCREEN_HEIGHT), SCREEN_TITLE)
         self.game_server_factory: GameServerFactory = game_server_factory
         self.state = None
+
+        self.settings = Settings(
+            number_of_players=4,
+            basic_spawn_count=20,
+            auto_spawn_count=3,
+            auto_spawn_time = 3.0,
+            max_spawn_count = 140
+        )
 
         self.__logger.debug(str(self.game_server_factory))
         arcade.set_background_color(arcade.color.SPACE_CADET)
