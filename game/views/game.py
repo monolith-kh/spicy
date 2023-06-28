@@ -17,7 +17,7 @@ player_count = 4
 basic_spawn_count = 20
 extra_spawn_count = 3
 extra_spawn_time = 3.0
-cube_max_count = 140
+cube_max_count = 1000
 
 cube_size = 0.04
 
@@ -79,7 +79,8 @@ class GameView(arcade.View):
         cl = list()
         for i in range(count):
             c = cube.Cube(self.cube_index, _type, cube_size)
-            sz = self.get_spawn_zone(random.randrange(0, 2))
+            # sz = self.get_spawn_zone(random.randrange(0, 2))
+            sz = self.get_spawn_zone(3)
             c.center_x = random.randrange(sz[0][0], sz[0][1])
             c.center_y = random.randrange(sz[1][0], sz[1][1])
             c.change_x = random.randrange(-1, 2)
