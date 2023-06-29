@@ -8,7 +8,6 @@ from twisted.logger import Logger
 
 import arcade
 
-from arcade import load_texture
 from arcade.gui import UIManager
 from arcade.gui.widgets import UITextArea, UIInputText, UITexturePane
 
@@ -155,11 +154,19 @@ class GameView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        self.manager.draw()
         self.cube_list.draw()
         self.pillar_1.draw()
         self.pillar_2.draw()
-        
+        self.manager.draw()
+        arcade.draw_text("In Game", self.window.width / 2, self.window.height / 2,
+                         arcade.color.WHITE, font_size=50, anchor_x="center",
+                         font_name=FONT)
+        player_text = ', '.join(
+            [f'Player {i.uid:02d}: {i.score} ({i.username}-{i.status})' for i in self.window.game_server_factory.player_manager.get_players().values()])
+        arcade.draw_text(player_text, self.window.width / 2, self.window.height / 2-150,
+                         arcade.color.ORANGE, font_size=24, anchor_x="center",
+                         font_name=FONT_THIN)
+
     def on_update(self, delta_time: float):
         self.cube_list.update()
         self.number_of_cubes_ui.text = f'Number of Cubes: {len(self.cube_list):03d}'

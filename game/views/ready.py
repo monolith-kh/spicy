@@ -10,7 +10,7 @@ from network.factory import Worker, WorkerAction
 
 class ReadyView(arcade.View):
 
-    def __init__(self, ):
+    def __init__(self):
         super().__init__()
 
     def on_show_view(self):
@@ -26,10 +26,10 @@ class ReadyView(arcade.View):
                          arcade.color.WHITE, font_size=20, anchor_x="center",
                          font_name=FONT_THIN)
         player_text = ', '.join(
-            [f'Player: #{i.uid:02d}-{i.username} ({i.status})' for i in self.window.game_server_factory.player_manager.get_players().values()])
+            [f'Player {i.uid:02d}: {i.score} ({i.username}-{i.status})' for i in self.window.game_server_factory.player_manager.get_players().values()])
         arcade.draw_text(player_text, self.window.width / 2, self.window.height / 2-150,
-                         arcade.color.WHITE, font_size=30, anchor_x="center",
-                         font_name=FONT)
+                         arcade.color.ORANGE, font_size=24, anchor_x="center",
+                         font_name=FONT_THIN)
         
     def on_update(self, delta_time: float):
         return super().on_update(delta_time)
