@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import arcade
+
 from enum import Enum, auto
 from typing import Dict, List, Optional
 import queue
@@ -34,12 +36,13 @@ class GameServerFactory(protocol.ServerFactory):
 
     def __init__(self):
         self.player_manager = player.PlayerManager()
+        self.cube_list = arcade.SpriteList()
         self.fb_builder = FlatbuffersBuilder()
         self.q = queue.Queue(self.Q_MAX_SIZE)
 
     def buildProtocol(self, addr):
         self.__logger.info(str(addr))
-        return GameProtocol(self.player_manager)
+        return GameProtocol(self.player_manager, self.cube_list)
 
     def worker(self):
         if not self.q.empty():

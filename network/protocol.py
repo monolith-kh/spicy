@@ -3,12 +3,14 @@
 import time
 from abc import ABC
 
+import arcade
+
 from twisted.internet.protocol import DatagramProtocol
 from twisted.logger import Logger
 
 from flatbuffers import Builder
 
-from fbs import Frame, Command, Sender, Response, Player
+from fbs import Frame, Command, Sender, Response, Player, Cube
 
 from .base import SizedPacketProtocol
 from .builder import FlatbuffersBuilder
@@ -21,11 +23,12 @@ from .ringggo_packet import Header, PositionObject, PositionNoti, Packet
 class GameProtocol(ABC, SizedPacketProtocol):
     __logger = Logger(__name__)
 
-    def __init__(self, player_manager: player.PlayerManager):
+    def __init__(self, player_manager: player.PlayerManager, cube_list: arcade.SpriteList):
         super().__init__()
         self.uid = -1
         self.fb_builder = FlatbuffersBuilder()
         self.player_manager = player_manager
+        self.cube_list = cube_list
 
     def connectionMade(self):
         self.__logger.info('New Connection')
@@ -98,8 +101,13 @@ class GameProtocol(ABC, SizedPacketProtocol):
             ...
             # TODO:
         elif received_frame.Command() == Command.Command.cube_remove:
-            ...
-            # TODO:
+            self.__logger.info('received cube remove command')
+            fbs_cube = Cube.Cube()
+            fbs_cube.Init(data.Bytes, data.Pos)
+            for c in self.cube_list:
+                if c.uid == fbs_cube.Uid():
+                    c.remove_from_sprite_lists()
+            self.__logger.info(f'removed {str(fbs_cube.Uid())} cube')
         elif received_frame.Command() == Command.Command.cube_status:
             ...
             # TODO:

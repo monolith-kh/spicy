@@ -22,14 +22,13 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
         self.cube_index = 0
-        self.cube_list: arcade.SpriteList = None
+        self.cube_list = self.window.game_server_factory.cube_list
+        self.settings: app.Settings = self.window.settings
         self.pillar_1: arcade.Sprite = None
         self.pillar_2: arcade.Sprite = None
-        self.settings: app.Settings = self.window.settings
 
     def setup(self):
         self.cube_index = 0
-        self.cube_list = arcade.SpriteList()
         cl = self.create_cube(self.settings.basic_spawn_count * self.settings.number_of_players, 0)
         arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.cube_create, cl))
         self.cube_list.extend(cl)
@@ -58,6 +57,7 @@ class GameView(arcade.View):
         self.cube_list.update()
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
+        self.cube_list.clear()
         arcade.unschedule(self.extra_cube)
         arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.game_finish))
         arcade.get_window().set_state(app.ArcadeState.result)
@@ -75,7 +75,6 @@ class GameView(arcade.View):
         cl = list()
         for i in range(count):
             c = cube.Cube(self.cube_index, _type, cube_size)
-            # sz = self.get_spawn_zone(random.randrange(0, 2))
             sz = self.get_spawn_zone(3)
             c.center_x = random.randrange(sz[0][0], sz[0][1])
             c.center_y = random.randrange(sz[1][0], sz[1][1])
