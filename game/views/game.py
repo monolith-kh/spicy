@@ -8,6 +8,10 @@ from twisted.logger import Logger
 
 import arcade
 
+from arcade import load_texture
+from arcade.gui import UIManager
+from arcade.gui.widgets import UITextArea, UIInputText, UITexturePane
+
 from game import FONT, FONT_THIN, SCREEN_WIDTH, SCREEN_HEIGHT
 from game import app, cube
 
@@ -26,6 +30,9 @@ class GameView(arcade.View):
         self.settings: app.Settings = self.window.settings
         self.pillar_1: arcade.Sprite = None
         self.pillar_2: arcade.Sprite = None
+        self.manager = UIManager()
+        self.number_of_cubes_ui: UITextArea = None
+        self.cube_index_ui: UITextArea = None
 
     def setup(self):
         self.cube_index = 0
@@ -36,6 +43,106 @@ class GameView(arcade.View):
         self.pillar_1 = arcade.Sprite('./game/resources/images/pillar.png', 0.39, center_x=940, center_y=662)
         self.pillar_2 = arcade.Sprite('./game/resources/images/pillar.png', 0.39, center_x=1710, center_y=662)
 
+        self.settings: app.Settings = self.window.settings
+
+        self.manager.enable()
+
+        v_box = arcade.gui.UIBoxLayout(vertical=True)
+        self.number_of_cubes_ui = UITextArea(
+            text=f'Number of Cubes: {len(self.cube_list):03d}',
+            width=450,
+            height=40,
+            text_color=arcade.color.GREEN,
+            font_size=14,
+            font_name=FONT
+        )
+        v_box.add(self.number_of_cubes_ui.with_space_around(bottom=0))
+
+        self.cube_index_ui = UITextArea(
+                    text=f'Cube index: {self.cube_index:03d}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT
+            )
+        v_box.add(self.cube_index_ui.with_space_around(bottom=0))
+
+        v_box.add(
+            UITextArea(
+                    text=f'Number of Players: {str(self.settings.number_of_players)}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT
+            ).with_space_around(bottom=0)
+        )
+
+        v_box.add(
+            UITextArea(
+                    text=f'Basic spawn count: {str(self.settings.basic_spawn_count)}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT
+            ).with_space_around(bottom=0)
+        )
+
+        v_box.add(
+            UITextArea(
+                    text=f'Auto spawn count: {str(self.settings.auto_spawn_count)}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT
+            ).with_space_around(bottom=0)
+        )
+
+        v_box.add(
+            UITextArea(
+                    text=f'Auto spawn sec tick: {str(self.settings.auto_spawn_time)}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT_THIN
+            ).with_space_around(bottom=0)
+        )
+
+        v_box.add(
+            UITextArea(
+                    text=f'Max spawn count: {str(self.settings.max_spawn_count)}',
+                    width=450,
+                    height=40,
+                    text_color=arcade.color.GREEN,
+                    font_size=14,
+                    font_name=FONT
+            ).with_space_around(bottom=10)
+        )
+
+        finish_button = arcade.gui.UIFlatButton(text="finish", width=200, style={'font_name': FONT})
+        v_box.add(finish_button.with_space_around(bottom=10))
+
+        self.manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="left",
+                align_x=10.0,
+                anchor_y="top",
+                align_y=-10.0,
+                child=v_box)
+        )
+
+        @finish_button.event("on_click")
+        def on_click_finish(event):
+            print("Finish:", event)
+            self.cube_list.clear()
+            arcade.unschedule(self.extra_cube)
+            arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.game_finish))
+            arcade.get_window().set_state(app.ArcadeState.result)
+
         arcade.set_background_color(arcade.color.SPACE_CADET)
         arcade.set_viewport(0, arcade.get_window().width, 0, arcade.get_window().height)
 
@@ -43,24 +150,20 @@ class GameView(arcade.View):
         self.setup()
         arcade.schedule(self.extra_cube, self.settings.auto_spawn_time)
 
+    def on_hide_view(self):
+        self.manager.disable()
+
     def on_draw(self):
         self.clear()
+        self.manager.draw()
         self.cube_list.draw()
         self.pillar_1.draw()
         self.pillar_2.draw()
-        output = f'Cube: {len(self.cube_list):03d}'
-        arcade.draw_text(output, 10, SCREEN_HEIGHT-40, arcade.color.GREEN, 14)
-        output = f'Cube index: {self.cube_index:03d}'
-        arcade.draw_text(output, 10, SCREEN_HEIGHT-60, arcade.color.GREEN, 14)
         
     def on_update(self, delta_time: float):
         self.cube_list.update()
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        self.cube_list.clear()
-        arcade.unschedule(self.extra_cube)
-        arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.game_finish))
-        arcade.get_window().set_state(app.ArcadeState.result)
+        self.number_of_cubes_ui.text = f'Number of Cubes: {len(self.cube_list):03d}'
+        self.cube_index_ui.text = f'Cube index: {self.cube_index:03d}'
 
     def extra_cube(self, delta_time: float) -> None:
         if len(self.cube_list) <= self.settings.max_spawn_count - self.settings.auto_spawn_count:
