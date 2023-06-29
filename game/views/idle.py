@@ -9,6 +9,9 @@ class IdleView(arcade.View):
 
     def __init__(self):
         super().__init__()
+        # self.logo_sprite = arcade.Sprite('./game/resources/images/logo-white-mono.png', 1.0)
+        # self.logo_sprite.center_x = self.window.width / 2
+        # self.logo_sprite.center_y = self.window.height / 2-75
 
     def on_show_view(self):
         arcade.set_background_color(arcade.csscolor.BLACK)
@@ -16,6 +19,7 @@ class IdleView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        # self.logo_sprite.draw()
         arcade.draw_text("Cube", self.window.width / 2, self.window.height / 2,
                          arcade.color.WHITE, font_size=50, anchor_x="center",
                          font_name=FONT)
