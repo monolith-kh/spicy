@@ -154,11 +154,14 @@ class SettingsView(arcade.View):
         def on_click_done(event):
             print("Done:", event)
             print(f'{number_of_players.text}, {basic_spawn_count.text}, {auto_spawn_count.text}, {auto_spawn_sec_tick.text}, {max_spawn_count.text}')
-            self.settings.number_of_players = int(number_of_players.text)
-            self.settings.basic_spawn_count = int(basic_spawn_count.text)
-            self.settings.auto_spawn_count = int(auto_spawn_count.text)
-            self.settings.auto_spawn_time = float(auto_spawn_sec_tick.text)
-            self.settings.max_spawn_count = int(max_spawn_count.text)
+            self.settings.save(dict(
+                number_of_players = int(number_of_players.text),
+                basic_spawn_count = int(basic_spawn_count.text),
+                auto_spawn_count = int(auto_spawn_count.text),
+                auto_spawn_time = float(auto_spawn_sec_tick.text),
+                max_spawn_count = int(max_spawn_count.text)
+            ))
+            self.settings.save_file()
             self.window.set_state(app.ArcadeState.menu)
 
         @cancel_button.event("on_click")

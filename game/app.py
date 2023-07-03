@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum, auto
-from dataclasses import dataclass
+import dataclasses
+import os.path
+
+import yaml
 
 import arcade
 from twisted.logger import Logger
@@ -29,13 +32,45 @@ class ArcadeState(Enum):
     settings = auto()
 
 
-@dataclass
+@dataclasses.dataclass
 class Settings:
-    number_of_players: int
-    basic_spawn_count: int
-    auto_spawn_count: int
-    auto_spawn_time: float
-    max_spawn_count: int
+    __logger = Logger(__name__)
+
+    number_of_players: int = 4
+    basic_spawn_count: int = 20
+    auto_spawn_count: int = 3
+    auto_spawn_time: float = 3.0
+    max_spawn_count: int = 140
+
+    def to_json(self):
+        return dataclasses.asdict(self)
+
+    __filename = './config.yaml'
+
+    def load_file(self):
+        if os.path.isfile(self.__filename):
+            with open(self.__filename, 'r') as f:
+                conf = yaml.safe_load(f)
+                self.number_of_players = conf['number_of_players']
+                self.basic_spawn_count = conf['basic_spawn_count']
+                self.auto_spawn_count = conf['auto_spawn_count']
+                self.auto_spawn_time = conf['auto_spawn_time']
+                self.max_spawn_count = conf['max_spawn_count']
+                self.__logger.info('config file loaded')
+        else:
+            self.__logger.warn('no config file')
+    
+    def save(self, conf: dict):
+        self.number_of_players = conf['number_of_players']
+        self.basic_spawn_count = conf['basic_spawn_count']
+        self.auto_spawn_count = conf['auto_spawn_count']
+        self.auto_spawn_time = conf['auto_spawn_time']
+        self.max_spawn_count = conf['max_spawn_count']
+
+    def save_file(self):
+        with open(self.__filename, 'w') as f:
+            yaml.dump(self.to_json(), f)
+            self.__logger.info('config file saved')
 
 
 class ArcadeWindow(arcade.Window):
@@ -47,13 +82,8 @@ class ArcadeWindow(arcade.Window):
         self.game_server_factory: GameServerFactory = game_server_factory
         self.state = None
 
-        self.settings = Settings(
-            number_of_players=4,
-            basic_spawn_count=20,
-            auto_spawn_count=3,
-            auto_spawn_time = 3.0,
-            max_spawn_count = 140
-        )
+        self.settings = Settings()
+        self.settings.load_file()
 
         self.__logger.debug(str(self.game_server_factory))
         arcade.set_background_color(arcade.color.SPACE_CADET)
