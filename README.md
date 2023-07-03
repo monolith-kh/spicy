@@ -1,5 +1,5 @@
-# spicy
-game server project for ar glass
+# cube-samgyeop
+cube game server project
 
 ## requirements
 Python3.7
