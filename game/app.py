@@ -7,6 +7,8 @@ import os.path
 import yaml
 
 import arcade
+
+from twisted.internet import reactor
 from twisted.logger import Logger
 
 from game import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, SPLASH_TIME, PING_ALL_TIME
@@ -94,19 +96,11 @@ class ArcadeWindow(arcade.Window):
 
         arcade.schedule(self.move_menu, SPLASH_TIME)
         arcade.schedule(self.send_ping_all, PING_ALL_TIME)
-
-    # def on_draw(self):
-    #     ''' Draw everything '''
-    #     self.clear()
-    #     self.all_sprites_list.draw()
-    #     self.bug_sprite_list.draw()
-
-    # def on_update(self, delta_time):
-    #     ''' Movement and game logic '''
-
-    #     # Call update on all sprites
-    #     self.all_sprites_list.update()
-    #     self.bug_sprite_list.update()
+    
+    def close(self):
+        super().close()
+        arcade.exit()
+        reactor.callFromThread(reactor.stop)
 
     def move_menu(self, delta_time: float):
         self.set_state(ArcadeState.menu)
