@@ -17,8 +17,6 @@ from .builder import FlatbuffersBuilder
 
 from model import player
 
-from .ringggo_packet import Header, PositionObject, PositionNoti, Packet
-
 
 class GameProtocol(ABC, SizedPacketProtocol):
     __logger = Logger(__name__)
@@ -114,42 +112,3 @@ class GameProtocol(ABC, SizedPacketProtocol):
         else:
             ...
             # TODO:
-
-
-class RtlsProtocol(DatagramProtocol):
-    __logger = Logger(__name__)
-
-    def __init__(self):
-        self.host = '192.168.40.254'
-        self.port = 9999
-
-    def startProtocol(self):
-        self.__logger.info('New connection')
-        self.transport.connect(self.host, self.port)
-
-        packet = Packet(
-            sender=Header.SENDER_ADMIN,
-            code=Header.PK_POSITION_RELAY)
-        self.transport.write(packet.to_bytes())
-
-    def stopProtocol(self):
-        self.__logger.info('Disconnected')
-
-    def datagramReceived(self, data, addr):
-        # self.__logger.debug('received {} from {}'.format(data, addr))
-        p = Packet.from_bytes(data)
-        self.__logger.debug('header code: {}'.format(p.header.code))
-        for c in p.body:
-            # RtlsService().cars[c.object_number] = dict(
-            #     x=c.position_noti.position_x,
-            #     y=c.position_noti.position_y
-            # )
-            self.__logger.debug('{}, {}, {}'.format(c.object_number, c.position_noti.position_x, c.position_noti.position_y))
-        # self.log.debug('car list: {cars}'.format(cars=RtlsService().cars))
-        # packet = Packet(
-        #     sender=Header.SENDER_ADMIN,
-        #     code=Header.PK_POSITION_LISTEN_STOP)
-        # self.transport.write(packet.to_bytes())
-
-    def connectionRefused(self):
-        self.__logger.info('No one listening')

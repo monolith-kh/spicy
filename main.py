@@ -8,7 +8,6 @@ from twisted.internet import reactor, endpoints, task
 from twisted.logger import Logger, globalLogPublisher, FilteringLogObserver, LogLevel, LogLevelFilterPredicate, textFileLogObserver
 
 from network.factory import GameServerFactory
-from network.protocol import RtlsProtocol
 
 import game
 
@@ -17,7 +16,7 @@ WORKER_FRQ = 0.1
 
 
 def main():
-    predicate = LogLevelFilterPredicate(defaultLogLevel=LogLevel.info)
+    predicate = LogLevelFilterPredicate(defaultLogLevel=LogLevel.debug)
     observer = FilteringLogObserver(textFileLogObserver(outFile=sys.stdout), [predicate])
     observer._encoding = 'utf-8'
     globalLogPublisher.addObserver(observer)
@@ -29,8 +28,6 @@ def main():
     tcp_server_endpoint = endpoints.TCP4ServerEndpoint(reactor, PORT)
     game_server_factory = GameServerFactory()
     tcp_server_endpoint.listen(game_server_factory)
-
-    reactor.listenUDP(0, RtlsProtocol())
 
     worker = task.LoopingCall(game_server_factory.worker)
     worker_deferred = worker.start(WORKER_FRQ, False)
