@@ -62,6 +62,9 @@ class GameProtocol(ABC, SizedPacketProtocol):
                 fbs_player.ImageUrl(),
                 fbs_player.Score(),
                 fbs_player.Status(),
+                fbs_player.Battery(),
+                fbs_player.Controller(),
+                fbs_player.Glass(),
                 self
             )
             self.__logger.info(str(p))

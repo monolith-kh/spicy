@@ -24,7 +24,7 @@ class ResultView(arcade.View):
                          arcade.color.WHITE, font_size=20, anchor_x="center",
                          font_name=FONT_THIN)
         player_text = ', '.join(
-            [f'Player {i.uid:02d}: {i.score} ({i.username}-{i.status})' for i in self.window.game_server_factory.player_manager.get_players().values()])
+            [f'Player {i.uid:02d}: {i.score} ({i.username}-{i.status})({i.battery}/{i.controller}/{i.glass})' for i in self.window.game_server_factory.player_manager.get_players().values()])
         arcade.draw_text(player_text, self.window.width / 2, self.window.height / 2-150,
                          arcade.color.ORANGE, font_size=24, anchor_x="center",
                          font_name=FONT_THIN)

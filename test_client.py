@@ -52,6 +52,9 @@ class GameClientProtocol(ABC, SizedPacketProtocol):
             image_url = '',
             score = 0,
             status = player.PlayerStatus.idle,
+            battery=0.0,
+            controller=False,
+            glass=False,
             protocol=None
         )
         self.fb_builder = FlatbuffersBuilder()
@@ -113,6 +116,9 @@ class GameClientProtocol(ABC, SizedPacketProtocol):
                     image_url=fbs_player_list.Players(i).ImageUrl(),
                     score=fbs_player_list.Players(i).Score(),
                     status=fbs_player_list.Players(i).Status(),
+                    battery=fbs_player_list.Players(i).Battery(),
+                    controller=fbs_player_list.Players(i).Controller(),
+                    glass=fbs_player_list.Players(i).Glass(),
                     protocol=None
                 )
                 print(p)

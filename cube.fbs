@@ -50,6 +50,9 @@ table Player {
     image_url: string;
     score: int;
     status: PlayerStatus;
+    battery: float;
+    controller: bool;
+    glass: bool;
 }
 
 table PlayerList {

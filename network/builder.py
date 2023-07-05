@@ -123,6 +123,9 @@ class FlatbuffersBuilder:
         Player.AddImageUrl(builder, image_url)
         Player.AddScore(builder, p.score)
         Player.AddStatus(builder, p.status)
+        Player.AddBattery(builder, p.battery)
+        Player.AddController(builder, p.controller)
+        Player.AddGlass(builder, p.glass)
 
         return Player.End(builder)
 

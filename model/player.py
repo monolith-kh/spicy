@@ -22,6 +22,9 @@ class Player:
     image_url: str
     score: int
     status: PlayerStatus
+    battery: float
+    controller: bool
+    glass: bool
     protocol: 'GameProtocol'
 
 class PlayerManager:

@@ -59,8 +59,29 @@ class Player(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
+    # Player
+    def Battery(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # Player
+    def Controller(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
+
+    # Player
+    def Glass(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
+
 def PlayerStart(builder):
-    builder.StartObject(5)
+    builder.StartObject(8)
 
 def Start(builder):
     PlayerStart(builder)
@@ -94,6 +115,24 @@ def PlayerAddStatus(builder, status):
 
 def AddStatus(builder, status):
     PlayerAddStatus(builder, status)
+
+def PlayerAddBattery(builder, battery):
+    builder.PrependFloat32Slot(5, battery, 0.0)
+
+def AddBattery(builder, battery):
+    PlayerAddBattery(builder, battery)
+
+def PlayerAddController(builder, controller):
+    builder.PrependBoolSlot(6, controller, 0)
+
+def AddController(builder, controller):
+    PlayerAddController(builder, controller)
+
+def PlayerAddGlass(builder, glass):
+    builder.PrependBoolSlot(7, glass, 0)
+
+def AddGlass(builder, glass):
+    PlayerAddGlass(builder, glass)
 
 def PlayerEnd(builder):
     return builder.EndObject()

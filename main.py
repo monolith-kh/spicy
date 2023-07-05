@@ -15,6 +15,9 @@ import game
 
 WORKER_FRQ = 0.1
 
+MANU_HOST = '192.168.40.254'
+MANU_PORT = 9998
+
 @click.command()
 @click.option('--port', default=1234, type=click.INT, required=True, help='set server port(default: 1234)')
 def main(port):
@@ -31,7 +34,7 @@ def main(port):
     game_server_factory = GameServerFactory()
     tcp_server_endpoint.listen(game_server_factory)
 
-    # tcp_client_endpoint = endpoints.TCP4ClientEndpoint(reactor, 'localhost', 4321)
+    # tcp_client_endpoint = endpoints.TCP4ClientEndpoint(reactor, MANU_HOST, MANU_PORT)
     # game_server_factory = GameServerFactory()
     # tcp_client_endpoint.connect(game_server_factory)
 
