@@ -165,7 +165,7 @@ class GameClientFactory(protocol.ClientFactory):
     __logger = Logger(__name__)
 
     def __init__(self, uid):
-        self.uid = uid 
+        self.uid = uid
         self.protocol = None
         self.__logger.info('uid: {}'.format(uid))
         self.fb_builder = FlatbuffersBuilder()

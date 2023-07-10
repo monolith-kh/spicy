@@ -74,6 +74,23 @@ class GameProtocol(ABC, SizedPacketProtocol):
             self.__logger.info(str(self.player_manager.get_players()))
         elif received_frame.Command() == Command.Command.ping:
             self.__logger.info('received ping command')
+
+            fbs_player = Player.Player()
+            fbs_player.Init(data.Bytes, data.Pos)
+            p = player.Player(
+                fbs_player.Uid(),
+                fbs_player.Username(),
+                fbs_player.ImageUrl(),
+                fbs_player.Score(),
+                fbs_player.Status(),
+                fbs_player.Battery(),
+                fbs_player.Controller(),
+                fbs_player.Glass(),
+                self
+            )
+            self.__logger.info(str(p))
+            self.player_manager.add_player(p)
+
             fb_data = self.fb_builder.response_ping()
             self.write(fb_data)
         elif received_frame.Command() == Command.Command.game_ready:
@@ -115,3 +132,21 @@ class GameProtocol(ABC, SizedPacketProtocol):
         else:
             ...
             # TODO:
+
+
+class RingggoClientProtocol(ABC, SizedPacketProtocol):
+    __logger = Logger(__name__)
+
+    def __init__(self):
+        super().__init__()
+
+    def connectionMade(self):
+        self.__logger.info('New Connection')
+
+    def connectionLost(self, reason):
+        self.__logger.info('Lost Connection: (reason: {})'.format(reason.getErrorMessage()))
+
+    def packetReceived(self, data: bytes):
+        self.__logger.debug('received packet raw data: {}'.format(str(data)))
+        # TODO:
+        ...

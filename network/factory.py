@@ -9,7 +9,7 @@ import queue
 from twisted.internet import protocol
 from twisted.logger import Logger
 
-from .protocol import GameProtocol
+from .protocol import GameProtocol, RingggoClientProtocol
 from .builder import FlatbuffersBuilder
 
 from model import player
@@ -76,3 +76,15 @@ class GameServerFactory(protocol.ServerFactory):
 
     def ebWorkerFailed(self, failure):
         self.__logger.info(failure.getBriefTraceback())
+
+
+class RingggoClientFactory(protocol.ClientFactory):
+    __logger = Logger(__name__)
+
+    def __init__(self):
+        self.protocol = None
+
+    def buildProtocol(self, addr):
+        self.__logger.info('addr: {}'.format(addr))
+        self.protocol = RingggoClientProtocol() 
+        return self.protocol
