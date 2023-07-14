@@ -12,8 +12,10 @@ from flatbuffers import Builder
 
 from fbs import Frame, Command, Sender, Response, Player, Cube
 
-from .base import SizedPacketProtocol
+from .base import SizedPacketProtocol, SizedPacketRingggoProtocol
 from .builder import FlatbuffersBuilder
+
+from .ringggo_packet import Packet, Header
 
 from model import player
 
@@ -134,7 +136,7 @@ class GameProtocol(ABC, SizedPacketProtocol):
             # TODO:
 
 
-class RingggoClientProtocol(ABC, SizedPacketProtocol):
+class RingggoClientProtocol(ABC, SizedPacketRingggoProtocol):
     __logger = Logger(__name__)
 
     def __init__(self):
@@ -147,6 +149,8 @@ class RingggoClientProtocol(ABC, SizedPacketProtocol):
         self.__logger.info('Lost Connection: (reason: {})'.format(reason.getErrorMessage()))
 
     def packetReceived(self, data: bytes):
-        self.__logger.debug('received packet raw data: {}'.format(str(data)))
-        # TODO:
-        ...
+        self.__logger.info('received packet raw data: {}'.format(str(data)))
+        # packet = Packet.from_bytes(data)
+        # self.__logger.debug(packet.header.code)
+        # # if packet.header.code not in [Header.PK_POSITION_OBJECTS]:
+        #     self.__logger.info(packet)

@@ -81,3 +81,32 @@ class SizedPacketProtocol(Protocol, metaclass=ABCMeta):
         sized_data[0:SIZE_BYTES_LENGTH] = (len(sized_data)).to_bytes(SIZE_BYTES_LENGTH, ENDIAN)
         sized_data[SIZE_BYTES_LENGTH:] = data
         self.transport.write(bytes(sized_data))
+
+
+class SizedPacketRingggoProtocol(Protocol, metaclass=ABCMeta):
+    def __init__(self) -> None:
+        super().__init__()
+
+        def get_packetsize_function(data: bytes):
+            print('get_packesize_function')
+            return int.from_bytes(data[0:8], 'little')
+
+        def received_function(data: bytes):
+            print(f'received_function: {data}')
+            self.packetReceived(data[8:])
+
+        self.__buffered_async_receiver = BufferedAsyncReceiver(BUFFER_SIZE, get_packetsize_function, received_function)
+
+    def dataReceived(self, data: bytes):
+        print('dataReceived')
+        self.__buffered_async_receiver.append_data(data)
+
+    @abstractmethod
+    def packetReceived(self, data: bytes):
+        pass
+
+    def write(self, data: bytes):
+        sized_data = bytearray(len(data) + 8)
+        sized_data[0:8] = (len(sized_data)).to_bytes(8, 'little')
+        sized_data[8:] = data
+        self.transport.write(bytes(sized_data))
