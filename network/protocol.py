@@ -149,7 +149,10 @@ class RingggoClientProtocol(ABC, SizedPacketRingggoProtocol):
         self.__logger.info('Lost Connection: (reason: {})'.format(reason.getErrorMessage()))
 
     def packetReceived(self, data: bytes):
-        self.__logger.info('received packet raw data: {}'.format(str(data)))
+        # self.__logger.info('received packet raw data: {}'.format(str(data)))
+        print(data)
+        packet = Packet.from_bytes(data)
+        print(packet)
         # packet = Packet.from_bytes(data)
         # self.__logger.debug(packet.header.code)
         # if packet.header.code == Header.PK_POSITION_OBJECTS:
