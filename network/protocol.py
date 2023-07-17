@@ -152,5 +152,7 @@ class RingggoClientProtocol(ABC, SizedPacketRingggoProtocol):
         self.__logger.info('received packet raw data: {}'.format(str(data)))
         # packet = Packet.from_bytes(data)
         # self.__logger.debug(packet.header.code)
-        # # if packet.header.code not in [Header.PK_POSITION_OBJECTS]:
-        #     self.__logger.info(packet)
+        # if packet.header.code == Header.PK_POSITION_OBJECTS:
+        #     print(f'{packet.header.car_number} - {packet.body}')
+        # else:
+        #     self.__logger.warn('invalid code')

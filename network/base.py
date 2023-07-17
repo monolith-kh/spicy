@@ -5,6 +5,7 @@ from twisted.internet.protocol import Protocol
 
 from typing import Callable, List
 
+from .ringggo_packet import Packet, Header
 from network import BUFFER_SIZE, SIZE_BYTES_LENGTH, ENDIAN
 
 
@@ -88,17 +89,15 @@ class SizedPacketRingggoProtocol(Protocol, metaclass=ABCMeta):
         super().__init__()
 
         def get_packetsize_function(data: bytes):
-            print('get_packesize_function')
-            return int.from_bytes(data[0:8], 'little')
+            header = Header.from_bytes(data[0:8])
+            return header.length
 
         def received_function(data: bytes):
-            print(f'received_function: {data}')
             self.packetReceived(data[8:])
 
         self.__buffered_async_receiver = BufferedAsyncReceiver(BUFFER_SIZE, get_packetsize_function, received_function)
 
     def dataReceived(self, data: bytes):
-        print('dataReceived')
         self.__buffered_async_receiver.append_data(data)
 
     @abstractmethod
