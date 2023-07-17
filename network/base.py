@@ -94,7 +94,7 @@ class SizedPacketRingggoProtocol(Protocol, metaclass=ABCMeta):
             return header.length
 
         def received_function(data: bytes):
-            self.packetReceived(data[8:])
+            self.packetReceived(data)
 
         self.__buffered_async_receiver = BufferedAsyncReceiver(BUFFER_SIZE, get_packetsize_function, received_function)
 
