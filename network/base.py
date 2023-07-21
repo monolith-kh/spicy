@@ -90,7 +90,6 @@ class SizedPacketRingggoProtocol(Protocol, metaclass=ABCMeta):
 
         def get_packetsize_function(data: bytes):
             header = Header.from_bytes(data[0:8])
-            print(header)
             return header.length
 
         def received_function(data: bytes):

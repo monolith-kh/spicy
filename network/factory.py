@@ -12,7 +12,7 @@ from twisted.logger import Logger
 from .protocol import GameProtocol, RingggoClientProtocol
 from .builder import FlatbuffersBuilder
 
-from model import player
+from model import player, ringggo
 
 
 class WorkerAction(Enum):
@@ -36,6 +36,7 @@ class GameServerFactory(protocol.ServerFactory):
 
     def __init__(self):
         self.player_manager = player.PlayerManager()
+        self.ringggo_manager = ringggo.RingggoManager()
         self.cube_list = arcade.SpriteList()
         self.fb_builder = FlatbuffersBuilder()
         self.q = queue.Queue(self.Q_MAX_SIZE)
@@ -81,10 +82,9 @@ class GameServerFactory(protocol.ServerFactory):
 class RingggoClientFactory(protocol.ClientFactory):
     __logger = Logger(__name__)
 
-    def __init__(self):
-        self.protocol = None
+    def __init__(self, game_server_factory: GameServerFactory):
+        self.ringggo_manager = game_server_factory.ringggo_manager
 
     def buildProtocol(self, addr):
         self.__logger.info('addr: {}'.format(addr))
-        self.protocol = RingggoClientProtocol() 
-        return self.protocol
+        return RingggoClientProtocol(self.ringggo_manager)

@@ -12,6 +12,7 @@ class ReadyView(arcade.View):
 
     def __init__(self):
         super().__init__()
+        print(self.window.game_server_factory.ringggo_manager.get_ringggos())
 
     def on_show_view(self):
         arcade.set_background_color(arcade.csscolor.DARK_GREEN)

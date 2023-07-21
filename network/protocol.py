@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import queue
 from abc import ABC
 
 import arcade
@@ -15,9 +16,9 @@ from fbs import Frame, Command, Sender, Response, Player, Cube
 from .base import SizedPacketProtocol, SizedPacketRingggoProtocol
 from .builder import FlatbuffersBuilder
 
-from .ringggo_packet import Packet, Header
+from .ringggo_packet import Packet, Header, BumpNoti
 
-from model import player
+from model import player, ringggo
 
 
 class GameProtocol(ABC, SizedPacketProtocol):
@@ -136,11 +137,44 @@ class GameProtocol(ABC, SizedPacketProtocol):
             # TODO:
 
 
+class Singleton(type):
+    __instances = {}
+
+    def __call__(self, *args, **kwargs):
+        if self not in self.__instances:
+            self.__instances[self] = super().__call__(*args, **kwargs)
+        return self.__instances[self]
+
+
+class RingoService(metaclass=Singleton):
+    __logger = Logger(__name__)
+
+    Q_MAX_SIZE = 65536
+
+    def __init__(self, *args, **kwargs):
+        self.__logger.info('init RingoSevice')
+        self.q = queue.Queue(self.Q_MAX_SIZE)
+    
+    def put_queue(self, data):
+        self.q.put(data)
+
+    def get_queue(self):
+        return self.q.get()
+    
+    def is_empty(self):
+        return self.q.empty()
+
+    def task_in_queue(self):
+        return self.q.queue
+
+
 class RingggoClientProtocol(ABC, SizedPacketRingggoProtocol):
     __logger = Logger(__name__)
 
-    def __init__(self):
+    def __init__(self, ringggo_manager: ringggo.RingggoManager):
         super().__init__()
+        RingoService()
+        self.ringggo_manager = ringggo_manager
 
     def connectionMade(self):
         self.__logger.info('New Connection')
@@ -149,15 +183,24 @@ class RingggoClientProtocol(ABC, SizedPacketRingggoProtocol):
         self.__logger.info('Lost Connection: (reason: {})'.format(reason.getErrorMessage()))
 
     def packetReceived(self, data: bytes):
-        # self.__logger.info('received packet raw data: {}'.format(str(data)))
-        print(data)
         packet = Packet.from_bytes(data)
-        print(packet)
-        # packet = Packet.from_bytes(data)
-        # self.__logger.debug(packet.header.code)
         if packet.header.code == Header.PK_POSITION_OBJECTS:
-            ...
-        #     print(f'{packet.header.car_number} - {packet.body}')
+            self.ringggo_manager.add_ringggo(
+                ringggo.Ringggo(
+                    packet.header.car_number,
+                    packet.body[0].position_noti.position_x,
+                    packet.body[0].position_noti.position_y,
+                    packet.body[0].position_noti.timestamp
+                )
+            )
+        elif packet.header.code == Header.PK_BUMP_NOTI:
+            if packet.body.bump_point == BumpNoti.BUMP_FRONT:
+                bump_ringggo = self.ringggo_manager.get_ringggo(packet.header.car_number)
+                self.__logger.debug(f'{packet.header.code} - {packet.header.car_number} - {packet.body} - {packet.body.bump_point}')
+                RingoService().put_queue(bump_ringggo)
+        elif packet.header.code == Header.PK_GAME_STEP_CHANGE_NOTI:
+            self.__logger.info(f'{packet.header.code} - {packet.header.car_number} - {packet.body} - {packet.body.step}')
+        elif packet.header.code == Header.PK_GAME_EVENT_NOTI:
+            self.__logger.info(f'{packet.header.code} - {packet.header.car_number} - {packet.body} - {packet.body.event}')
         else:
-            print(packet.header.code)
-            # self.__logger.warn(packet.header.code)
+            self.__logger.warn(f'invalid code ({packet.header.code})')

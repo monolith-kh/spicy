@@ -15,6 +15,7 @@ from game import FONT, FONT_THIN, SCREEN_WIDTH, SCREEN_HEIGHT
 from game import app, cube
 
 from network.factory import Worker, WorkerAction
+from network.protocol import RingoService
 
 cube_size = 0.04
 
@@ -139,6 +140,7 @@ class GameView(arcade.View):
             print("Finish:", event)
             self.cube_list.clear()
             arcade.unschedule(self.extra_cube)
+            arcade.unschedule(self.bump_ringggo)
             arcade.get_window().game_server_factory.q.put(Worker(WorkerAction.game_finish))
             arcade.get_window().set_state(app.ArcadeState.result)
 
@@ -148,6 +150,7 @@ class GameView(arcade.View):
     def on_show_view(self):
         self.setup()
         arcade.schedule(self.extra_cube, self.settings.auto_spawn_time)
+        arcade.schedule(self.bump_ringggo, 1/60)
 
     def on_hide_view(self):
         self.manager.disable()
@@ -171,6 +174,15 @@ class GameView(arcade.View):
         self.cube_list.update()
         self.number_of_cubes_ui.text = f'Number of Cubes: {len(self.cube_list):03d}'
         self.cube_index_ui.text = f'Cube index: {self.cube_index:03d}'
+
+    def bump_ringggo(self, delta_time: float) -> None:
+        while True:
+            if RingoService().is_empty():
+                return
+            else:
+                ringggo: ringggo.Ringggo = RingoService().get_queue()
+                print(ringggo)
+                print(RingoService().task_in_queue())
 
     def extra_cube(self, delta_time: float) -> None:
         if len(self.cube_list) <= self.settings.max_spawn_count - self.settings.auto_spawn_count:

@@ -36,7 +36,7 @@ def main(port):
     tcp_server_endpoint.listen(game_server_factory)
 
     tcp_client_endpoint = endpoints.TCP4ClientEndpoint(reactor, MANU_HOST, MANU_PORT, timeout=5)
-    ringggo_client_factory = RingggoClientFactory()
+    ringggo_client_factory = RingggoClientFactory(game_server_factory)
     tcp_client_endpoint.connect(ringggo_client_factory)
 
     worker = task.LoopingCall(game_server_factory.worker)
